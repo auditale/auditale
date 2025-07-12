@@ -1,5 +1,5 @@
 const express = require('express');
-const { testingBaseURL } = require('./controllers/testingController');
+const { testingBaseURL } = require('./Controllers/testingController');
 const { handleRegisterUser } = require('./Controllers/authController');
 const { validateLoginUser, validateRegisterUser } = require('./Validators/userValidator');
 
