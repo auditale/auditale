@@ -1,6 +1,6 @@
 const express = require('express');
-const { testingBaseURL } = require('./Controllers/testingController');
-const { handleRegisterUser } = require('./Controllers/authController');
+const { testingBaseURL } = require('./Controller/testingController');
+const { handleRegisterUser } = require('./Controller/authController');
 const { validateLoginUser, validateRegisterUser } = require('./Validators/userValidator');
 
 const app = express();
