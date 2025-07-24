@@ -1,25 +1,38 @@
 const express = require('express');
 const { testingBaseURL } = require('./Controller/testingController');
-const { handleRegisterUser } = require('./Controller/authController');
+const { handleLoginUser, handleRegisterUser } = require('./Controller/authController');
+const { handleAddCategory } = require('./Controller/categoryController');
+const { handleAddStory } = require('./Controller/storyController');
+const { validateStory } = require('./Validators/storyValidator');
+const { handleAuthUser } = require('./Middlewares/authMiddleware');
 const { validateLoginUser, validateRegisterUser } = require('./Validators/userValidator');
+const { validateCategory } = require('./Validators/categoryValidator');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const port = 3000;
 
 app.use(express.json()); // for JSON payloads
 app.use(express.urlencoded({ extended: true })); // for form submissions (x-www-form-urlencoded)
+app.use(cookieParser());
 
 app.get('/', testingBaseURL);
-app.post('/register', validateRegisterUser, handleRegisterUser);
-
 
 app.listen(port, () => {
     console.log(`Server running at: ${port}/`);
 });
 
 // Mongo DB Connection
-const connectDB = require('./dbconnection')
+const connectDB = require('./dbconnection');
 connectDB();
 
 // Users Route
-app.post('/register', handleRegisterUser);
+// app.post('/register', handleRegisterUser);
+app.post('/register', validateRegisterUser, handleRegisterUser);
+app.post('/login', validateLoginUser, handleLoginUser);
+
+// Category Route
+app.post('/addCategory', validateCategory, handleAddCategory);
+
+// Story Route
+app.post('/addStory', handleAuthUser, validateStory, handleAddStory);
