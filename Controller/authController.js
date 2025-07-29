@@ -71,17 +71,16 @@ async function handleUpdateProfile(req, res) {
     if (req.body.username) updates.username = req.body.username;
     if (req.body.email) updates.email = req.body.email;
 
-    return res.json({ "values": updates });
 
-    // if (Object.keys(updates).length === 0) {
-    //     return res.status(400).json({ error: "Please provide atleast username or email to update the profile data." });
-    // }
+    if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ error: "Please provide atleast username or email to update the profile data." });
+    }
 
-    // const updatedProfileData = await User.updateOne(
-    //     { _id: userId },
-    //     { $set: updates}
-    // );
-    
+    const updatedProfileData = await User.updateOne(
+        { _id: userId },
+        { $set: updates}
+    );
+    return res.json({ "values": updatedProfileData });
 }
 
 module.exports = {
