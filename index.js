@@ -3,6 +3,7 @@ const { testingBaseURL } = require('./Controller/testingController');
 const { handleLoginUser, handleRegisterUser } = require('./Controller/authController');
 const { handleAddCategory } = require('./Controller/categoryController');
 const { handleAddStory } = require('./Controller/storyController');
+const { handleAddFavourite, handleRemoveFavourite } = require('./Controller/favouriteController');
 const { validateStory } = require('./Validators/storyValidator');
 const { handleAuthUser } = require('./Middlewares/authMiddleware');
 const { validateLoginUser, validateRegisterUser } = require('./Validators/userValidator');
@@ -36,3 +37,7 @@ app.post('/addCategory', validateCategory, handleAddCategory);
 
 // Story Route
 app.post('/addStory', handleAuthUser, validateStory, handleAddStory);
+
+// Favourite Route
+app.post('/addFav', handleAuthUser, handleAddFavourite);
+app.post('/removeFav', handleAuthUser, handleRemoveFavourite);
