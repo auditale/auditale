@@ -6,17 +6,17 @@ async function handleAddFavourite(req, res) {
         const userId = req.data.loggedInUserData._id;
         const { storyIds } = req.body;
 
-        if(!storyIds) return res.status(400).json({ error: "Please provide the story id first." })
+        if(!storyIds) return res.status(400).json({ error: "Please provide the story id first." });
 
         const storyId = new ObjectId(storyIds);
 
         const favouriteExistData = await Favourite.findOne({ userId, storyId });
-        if(favouriteExistData) return res.status(400).json({ error: "The story is already liked by the loggedin user." }) 
+        if(favouriteExistData) return res.status(400).json({ error: "The story is already liked by the loggedin user." }); 
         
         const favouriteData = await Favourite.create({userId, storyId});
-        if(!favouriteData) return res.status(400).json({ error: "Favourite is not added. Please try again later" })
+        if(!favouriteData) return res.status(400).json({ error: "Favourite is not added. Please try again later" });
         
-        return res.status(201).json({"value":"Story added to favourite successfully"});
+        return res.status(201).json({"value":"Story added to favourite successfully" });;
 
     } catch (error) {
         console.error(error);
@@ -29,12 +29,12 @@ async function handleRemoveFavourite(req, res) {
         const userId = req.data.loggedInUserData._id;
         const { storyIds } = req.body;
         
-        if(!storyIds) return res.status(400).json({ error: "Please provide the story id first." })
+        if(!storyIds) return res.status(400).json({ error: "Please provide the story id first." });
 
         const storyId = new ObjectId(storyIds);
 
         const favouriteExistData = await Favourite.deleteOne({ storyId: storyId, userId: userId });
-        if(!favouriteExistData) return res.status(400).json({ error: "Record not found, please try again later." })
+        if(!favouriteExistData) return res.status(400).json({ error: "Record not found, please try again later." });
         
         
         return res.status(201).json({ "value":"Story removed from the favourite successfully." });

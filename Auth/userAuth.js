@@ -8,7 +8,7 @@ function setUser(loggedInUserData){
 }
 
 function getUser(uid) {
-    if(!uid) return res.json({ "value": "Please provide the uid" })
+    if(!uid) return res.json({ "value": "Please provide the uid" });
     return jwt.verify(uid, secret);
 }
 

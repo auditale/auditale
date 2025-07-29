@@ -1,10 +1,11 @@
 const express = require('express');
 const { testingBaseURL } = require('./Controller/testingController');
-const { handleLoginUser, handleRegisterUser } = require('./Controller/authController');
+const { handleLoginUser, handleRegisterUser, handleUserProfile, handleAddUpdateProfileImage, handleUpdateProfile } = require('./Controller/authController');
 const { handleAddCategory } = require('./Controller/categoryController');
 const { handleAddStory } = require('./Controller/storyController');
 const { handleAddFavourite, handleRemoveFavourite } = require('./Controller/favouriteController');
 const { validateStory } = require('./Validators/storyValidator');
+const { handleSearchStory } = require('./Controller/searchController');
 const { handleAuthUser } = require('./Middlewares/authMiddleware');
 const { validateLoginUser, validateRegisterUser } = require('./Validators/userValidator');
 const { validateCategory } = require('./Validators/categoryValidator');
@@ -27,17 +28,23 @@ app.listen(port, () => {
 const connectDB = require('./dbconnection');
 connectDB();
 
-// Users Route
+// Users Routes
 // app.post('/register', handleRegisterUser);
 app.post('/register', validateRegisterUser, handleRegisterUser);
 app.post('/login', validateLoginUser, handleLoginUser);
+app.get('/getProfile', handleAuthUser, handleUserProfile);
+app.post('/addProfileImage', handleAuthUser, handleAddUpdateProfileImage);
+app.post('/updateProfile', handleAuthUser, handleUpdateProfile);
 
-// Category Route
+// Category Routes
 app.post('/addCategory', validateCategory, handleAddCategory);
 
-// Story Route
+// Story Routes
 app.post('/addStory', handleAuthUser, validateStory, handleAddStory);
 
-// Favourite Route
+// Favourite Routes
 app.post('/addFav', handleAuthUser, handleAddFavourite);
 app.post('/removeFav', handleAuthUser, handleRemoveFavourite);
+
+// Search Routes
+app.post('/searchStory', handleSearchStory);
