@@ -8,7 +8,7 @@ async function handleRegisterUser(req, res) {
         const registerUserData = await User.create({ username, email, password });
 
         if(!registerUserData) return res.status(400).json({ error: "User is not generated. Please try again later" });
-        return res.status(201).json({"value":"data inserted successfully" });
+        return res.status(201).json({"value": registerUserData });
         
     } catch (error) {
         console.error(error);
