@@ -18,6 +18,11 @@ const storySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    categoryId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category', // This should match the name of your Category model
+        required: true
+    }
 }, { timestamps: true });
 
 const Story = mongoose.model('Story', storySchema);

@@ -1,6 +1,8 @@
 const User = require('../Models/userModel');
 const { setUser } = require('../Auth/userAuth');
 const Profile = require('../Models/profileModel');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 async function handleRegisterUser(req, res) {
     try {
@@ -8,7 +10,7 @@ async function handleRegisterUser(req, res) {
         const registerUserData = await User.create({ username, email, password });
 
         if(!registerUserData) return res.status(400).json({ error: "User is not generated. Please try again later" });
-        return res.status(201).json({"value": registerUserData });
+        return res.status(201).json(registerUserData);
         
     } catch (error) {
         console.error(error);
@@ -28,7 +30,7 @@ async function handleLoginUser(req, res) {
         const token = setUser(loggedInUserData);
         res.cookie('uid', token);
         
-        return res.status(201).json({"values": loggedInUserData});
+        return res.status(201).json(loggedInUserData);
 
     } catch (error) {
         console.error(error);
@@ -38,10 +40,36 @@ async function handleLoginUser(req, res) {
 
 async function handleUserProfile(req, res) {
     const userId = req.data.loggedInUserData._id;
-    const profileData = await Profile.findOne({ userId });
+    const profileData = await Profile.aggregate([
+            {
+                $match: {
+                    "userId": new ObjectId(userId)
+                }
+            },
+            // join with profile - user
+            {   $lookup:{
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userdata"
+                }
+            },
+            {   $unwind: {
+                    path: "$userdata",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {   $project: {
+                    userId: 1,
+                    username: "$userdata.username",
+                    email: "$userdata.email",
+                    password: "$userdata.password" 
+                }
+            }
+        ])
 
     if(!profileData) return res.status(400).json({ error: "Profile data is not found. Please add the data first." });
-    return res.status(201).json({"value": profileData});
+    return res.status(201).json(profileData);
 }
 
 async function handleAddUpdateProfileImage(req, res) {
@@ -61,7 +89,7 @@ async function handleAddUpdateProfileImage(req, res) {
     );
 
     if(!profileData) return res.status(400).json({ error: "Profile data is not generated. Please try again later" });
-    return res.status(201).json({"value": profileData});
+    return res.status(201).json({ message:"profile image add or updated successfully." });
 }
 
 async function handleUpdateProfile(req, res) {
@@ -76,11 +104,38 @@ async function handleUpdateProfile(req, res) {
         return res.status(400).json({ error: "Please provide atleast username or email to update the profile data." });
     }
 
-    const updatedProfileData = await User.updateOne(
+    const updatedProfileData = await User.findOneAndUpdate(
         { _id: userId },
-        { $set: updates}
+        { $set: updates},
+        { new: true }
     );
-    return res.json({ "values": updatedProfileData });
+
+    return res.json(updatedProfileData);
+}
+
+async function handleUpdatePassword(req, res) {
+    try{
+        const userId = req.data.loggedInUserData._id;
+        const { oldPassword, newPassword } = req.body;
+        const updates = {};
+
+        const loggedInUserData = await User.find({ _id: userId, password: oldPassword });
+
+        if(loggedInUserData.length != 0) {
+            updates.password = newPassword;
+            const updatedPasswordData = await User.findOneAndUpdate(
+                { _id: userId },
+                { $set: updates },
+                { new: true }
+            );  
+            if(updatedPasswordData) return res.status(200).json({ message:"Password is updated successfully." });
+        }else{
+            return res.status(404).json({ error:"User is not found, please check your existing password again." });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
 }
 
 module.exports = {
@@ -88,5 +143,6 @@ module.exports = {
     handleLoginUser,
     handleUserProfile,
     handleAddUpdateProfileImage,
-    handleUpdateProfile
+    handleUpdateProfile,
+    handleUpdatePassword
 }
