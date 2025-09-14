@@ -1,0 +1,86 @@
+const Favourite = require('../Models/favouriteModel');
+const History = require('../Models/historyModel');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
+
+async function handleGetHistory(req, res) {
+    try {
+        const userId = req.data.loggedInUserData._id;
+        
+        const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
+        const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
+        
+        const latestHistoryData = await History.aggregate([
+            {   $match: {   "userId": new ObjectId(userId)  }   }, 
+            {   $sort: {    createdAt: -1   }   },
+            {   $limit: 100 },
+            {
+                $addFields: {
+                isFav: {
+                    $cond: [
+                    { $in: ["$storyId", finalUserFavouriteStory ]},
+                    1,
+                    0
+                    ]
+                }
+                }
+            },
+            // join with history - story
+            {   $lookup:{
+                    from: "stories",
+                    localField: "storyId",
+                    foreignField: "_id",
+                    as: "storydata"
+                }
+            }, {   $unwind: {
+                    path: "$storydata",
+                    preserveNullAndEmptyArrays: true
+                }
+            }, {   $project: {
+                    _id: 1,
+                    storyTitle: "$storydata.storyTitle",
+                    storyDescription: "$storydata.storyDescription",
+                    storyImage: "$storydata.storyImage",
+                    storyURL: "$storydata.storyURL",
+                    isFav: 1
+                }
+            }
+        ])
+
+        if(latestHistoryData.length == 0) return res.status(400).json({ error: "Record not found, please play some stories first." });    
+        return res.status(200).json(latestHistoryData);
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+}
+
+async function handleAddHistory(req, res) {
+    try {
+        const userId = req.data.loggedInUserData._id;
+        const { storyId } = req.body;
+        
+        const HistoryData = await History.findOneAndUpdate(
+            { userId, storyId }, // find history by user id and story id
+            { userId, storyId }, // update or insert the history data
+            {
+                upsert: true,
+                new: true, // return the updated doc
+                setDefaultsOnInsert: true
+            }
+        );
+
+        if(!HistoryData) return res.status(400).json({ error: "History data is not generated. Please try again later" });
+        return res.status(201).json({ message:"History data add or updated successfully." });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+}
+
+module.exports = {
+    handleGetHistory,
+    handleAddHistory
+}

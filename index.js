@@ -4,7 +4,9 @@ const { handleLoginUser, handleRegisterUser, handleUserProfile, handleAddUpdateP
 const { handleAddCategory } = require('./Controller/categoryController');
 const { handleAddStory, handleGetAllStory, handleGetAllCategoryBasedStory } = require('./Controller/storyController');
 const { handleAddRemoveFavourite } = require('./Controller/favouriteController');
+const { handleAddRatings } = require('./Controller/ratingController');
 const { validateStory } = require('./Validators/storyValidator');
+const { handleAddHistory, handleGetHistory } = require('./Controller/historyController');
 const { handleSearchStory, handleAddRemoveRecentSearched, handleGetAllRecentSearched } = require('./Controller/searchController');
 const { handleAuthUser } = require('./Middlewares/authMiddleware');
 const { validateLoginUser, validateRegisterUser } = require('./Validators/userValidator');
@@ -53,3 +55,10 @@ app.post('/addRemoveFav', handleAuthUser, handleAddRemoveFavourite);
 app.post('/searchStory', handleSearchStory);
 app.post('/addRemoveRecentSearched', handleAuthUser, handleAddRemoveRecentSearched);
 app.get('/getRecentSearched', handleAuthUser, handleGetAllRecentSearched);
+
+// Rating Routes
+app.post('/addRating', handleAuthUser, handleAddRatings);
+
+// History Routes
+app.post('/addHistory', handleAuthUser, handleAddHistory);
+app.get('/getHistory', handleAuthUser, handleGetHistory);
