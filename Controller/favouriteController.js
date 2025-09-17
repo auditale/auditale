@@ -4,7 +4,7 @@ const { ObjectId } = require('mongoose').Types;
 async function handleAddRemoveFavourite(req, res) {
     try {
         const userId = req.data.loggedInUserData._id;
-        const { storyIds, isFav } = req.body;
+        const { storyIds } = req.body;
 
         if(!storyIds) return res.status(400).json({ error: "Please provide the story id first." });
 
