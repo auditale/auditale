@@ -1,5 +1,7 @@
 const Story = require('../Models/storyModel');
 const Favourite = require('../Models/favouriteModel');
+const Category = require('../Models/categoryModel');
+const Rating = require('../Models/ratingModel');
 const { ObjectId } = require('mongoose').Types;
 
 async function handleAddStory(req, res) {
@@ -17,81 +19,132 @@ async function handleAddStory(req, res) {
 }
 
 async function handleGetAllStory(req, res) {
-    const userId = req.data.loggedInUserData._id;
-    
-    const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
-    const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
-    
-    const finalAllStoryWithUserFavourite = await Story.aggregate([
-                                {
-                                    $addFields: {
-                                    isFav: {
-                                        $cond: [
-                                        { $in: ["$_id", finalUserFavouriteStory ]},
-                                        1,
-                                        0
-                                        ]
+    try {
+        const userId = req.data.loggedInUserData._id;
+        const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
+        const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
+        
+        const finalAllStoryWithUserFavourite = await Story.aggregate([
+                                    {
+                                        $addFields: {
+                                        isFav: {
+                                            $cond: [
+                                            { $in: ["$_id", finalUserFavouriteStory ]},
+                                            1,
+                                            0
+                                            ]
+                                        }
+                                        }
                                     }
-                                    }
-                                }
-                            ]);
-                            
-    if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category." });
-    return res.status(200).json(finalAllStoryWithUserFavourite);
+                                ]);
+                                
+        if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category." });
+        return res.status(200).json(finalAllStoryWithUserFavourite);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
 }
 
 async function handleGetAllCategoryBasedStory(req, res) {
-    const { categoryId } = req.body;
-    const userId = req.data.loggedInUserData._id;
+    try {
+        const { categoryId } = req.body;
+        const userId = req.data.loggedInUserData._id;
 
-    const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
-    const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
+        const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
+        const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
 
-    if(categoryId != ""){
-        const finalCategoryId = new ObjectId(categoryId);
-        const finalAllStoryWithUserFavourite = await Story.aggregate([{
-                                    $match: {
-                                        categoryId: finalCategoryId
-                                    }
-                                },
-                                {
-                                $addFields: {
-                                    isFav: {
-                                        $cond: [
-                                        { $in: ["$_id", finalUserFavouriteStory ]},
-                                        1,
-                                        0
-                                        ]
-                                    }
-                                    }
-                                }
-                            ]);
-
-
-        if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category." });
-        return res.status(200).json(finalAllStoryWithUserFavourite);
-    }else{
-        const finalAllStoryWithUserFavourite = await Story.aggregate([
-                                {
+        if(categoryId != ""){
+            const finalCategoryId = new ObjectId(categoryId);
+            const finalAllStoryWithUserFavourite = await Story.aggregate([{
+                                        $match: {
+                                            categoryId: finalCategoryId
+                                        }
+                                    },
+                                    {
                                     $addFields: {
-                                    isFav: {
-                                        $cond: [
-                                        { $in: ["$_id", finalUserFavouriteStory ]},
-                                        1,
-                                        0
-                                        ]
+                                        isFav: {
+                                            $cond: [
+                                            { $in: ["$_id", finalUserFavouriteStory ]},
+                                            1,
+                                            0
+                                            ]
+                                        }
+                                        }
                                     }
-                                    }
-                                }
-                            ]);
+                                ]);
 
-        if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category." });
-        return res.status(200).json(finalAllStoryWithUserFavourite);
+
+            if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category." });
+            return res.status(200).json(finalAllStoryWithUserFavourite);
+        }else{
+            const finalAllStoryWithUserFavourite = await Story.aggregate([
+                                    {
+                                        $addFields: {
+                                        isFav: {
+                                            $cond: [
+                                            { $in: ["$_id", finalUserFavouriteStory ]},
+                                            1,
+                                            0
+                                            ]
+                                        }
+                                        }
+                                    }
+                                ]);
+
+            if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category." });
+            return res.status(200).json(finalAllStoryWithUserFavourite);
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
     }
+}
+
+async function handleGetAllGenreWithStories(req, res) {
+    try {
+        const allCategories = await Category.find();
+        const finalallCategories = allCategories.map(item => item._id);
+
+        const getThreeStoriesOfEachCategory = await Story.find({ categoryId: { $in: finalallCategories } })
+        .sort({ createdAt: -1 })  // Sort by 'createdAt' descending (latest first)
+        .limit(3);
+
+        // Function to group stories by categoryId
+        const groupStoriesByCategory = (getThreeStoriesOfEachCategory) => {
+        return getThreeStoriesOfEachCategory.reduce((acc, item) => {
+            const { categoryId } = item;
+            if (!acc[categoryId]) {
+                acc[categoryId] = [];
+            }
+            acc[categoryId].push(item);
+            return acc;
+        }, {});
+        };
+
+        // Group stories
+        const finalGroupStoriesByCategory = groupStoriesByCategory(getThreeStoriesOfEachCategory);
+        return res.status(200).json(finalGroupStoriesByCategory);
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+}
+
+async function handleGetTrialStories(req, res) {
+    try {
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }   
 }
 
 module.exports = {
     handleAddStory,
     handleGetAllStory,
-    handleGetAllCategoryBasedStory
+    handleGetAllCategoryBasedStory,
+    handleGetAllGenreWithStories,
+    handleGetTrialStories
 }
