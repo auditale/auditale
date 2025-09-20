@@ -18,6 +18,10 @@ const storySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    tags:{
+        type: String,
+        required: true,
+    },
     categoryId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category', // This should match the name of your Category model

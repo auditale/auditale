@@ -141,10 +141,55 @@ async function handleGetTrialStories(req, res) {
     }   
 }
 
+async function handleGetAllRelatedStories(req, res) {
+    try {
+        const userId = req.data.loggedInUserData._id;
+        const { currentStoryId } = req.body;
+        const storyData = await Story.find({ _id: currentStoryId }, { _id: 0, categoryId: 1, tags: 1 });
+
+        const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
+        const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
+
+        const finalStoryData = await Story.aggregate([
+                                                    {
+                                                        $addFields: {
+                                                            isFav: {
+                                                                $cond: [
+                                                                { $in: ["$_id", finalUserFavouriteStory ]},
+                                                                1,
+                                                                0
+                                                                ]
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        $match: {
+                                                            $or: [
+                                                                {categoryId: storyData[0]['categoryId']}, 
+                                                                {tags: storyData[0]['tags']}
+                                                            ],
+                                                            _id: { $ne: new ObjectId(currentStoryId) }
+                                                        }
+                                                    },
+                                                    {
+                                                        $sort: { createdAt: -1 }
+                                                    }
+                                                ]);
+        
+        if(finalStoryData.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category and tags." });
+        return res.status(200).json(finalStoryData);
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+}
+
 module.exports = {
     handleAddStory,
     handleGetAllStory,
     handleGetAllCategoryBasedStory,
     handleGetAllGenreWithStories,
-    handleGetTrialStories
+    handleGetTrialStories,
+    handleGetAllRelatedStories
 }
