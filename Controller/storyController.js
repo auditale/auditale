@@ -134,7 +134,37 @@ async function handleGetAllGenreWithStories(req, res) {
 
 async function handleGetTrialStories(req, res) {
     try {
-        
+        const trailStoriesData = await Rating.aggregate([
+                                    {
+                                        $group: {
+                                            _id: '$storyId', // Group by storyId
+                                            totalStarCount: { $sum: '$starCount' }, // Sum starCount for each story
+                                        },
+                                    },
+                                    {
+                                        $lookup: {
+                                            from: 'stories',
+                                            localField: '_id',
+                                            foreignField: '_id',
+                                            as: 'storydata',
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            _id: 1,
+                                            totalStarCount: 1,
+                                            storydata: { $arrayElemAt: ['$storydata', 0] }, // Get the first storyDetails object (no repetition)
+                                        }
+                                    },
+                                    {
+                                        $sort: { totalStarCount: -1 }, // Sort by totalStarCount in descending order
+                                    },
+                                    { $limit: 100 }
+                                ]);
+
+        if(trailStoriesData.length == 0) return res.status(200).json({ "error":"No stories found." });
+        return res.status(200).json(trailStoriesData);
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Internal server error." });

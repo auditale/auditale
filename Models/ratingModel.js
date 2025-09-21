@@ -12,7 +12,7 @@ const RatingSchema = new mongoose.Schema({
         required: true
     },
     starCount:{
-        type: String,
+        type: Number,
         required: true,
     }
 }, { timestamps: true });
