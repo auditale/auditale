@@ -2,7 +2,7 @@ const express = require('express');
 const { testingBaseURL } = require('./Controller/testingController');
 const { handleLoginUser, handleRegisterUser, handleUserProfile, handleAddUpdateProfileImage, handleUpdateProfile, handleUpdatePassword } = require('./Controller/authController');
 const { handleAddCategory } = require('./Controller/categoryController');
-const { handleAddStory, handleGetAllStory, handleGetAllCategoryBasedStory, handleGetAllGenreWithStories, handleGetTrialStories, handleGetAllRelatedStories } = require('./Controller/storyController');
+const { handleAddStory, handleGetAllStory, handleGetAllCategoryBasedStory, handleGetAllGenreWithStories, handleGetTrialStories, handleGetAllRelatedStories, handleGetAllUserRecommedationsStories } = require('./Controller/storyController');
 const { handleAddRemoveFavourite } = require('./Controller/favouriteController');
 const { handleAddRatings } = require('./Controller/ratingController');
 const { validateStory } = require('./Validators/storyValidator');
@@ -49,7 +49,7 @@ app.get('/getAllStory', handleAuthUser, handleGetAllStory);
 app.get('/getCategoryBasedStory', handleAuthUser, handleGetAllCategoryBasedStory);
 app.get('/getAllGenreWithStories', handleAuthUser, handleGetAllGenreWithStories);
 app.get('/relatedStories', handleAuthUser, handleGetAllRelatedStories);
-
+app.get('/userRecommendationsStories', handleAuthUser, handleGetAllUserRecommedationsStories);
 
 // Favourite Routes
 app.post('/addRemoveFav', handleAuthUser, handleAddRemoveFavourite);

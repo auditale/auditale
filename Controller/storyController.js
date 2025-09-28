@@ -215,11 +215,21 @@ async function handleGetAllRelatedStories(req, res) {
     }
 }
 
+async function handleGetAllUserRecommedationsStories(req, res) {
+    try {
+        console.log("handleGetAllUserRecommedationsStories")
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+}
+
 module.exports = {
     handleAddStory,
     handleGetAllStory,
     handleGetAllCategoryBasedStory,
     handleGetAllGenreWithStories,
     handleGetTrialStories,
-    handleGetAllRelatedStories
+    handleGetAllRelatedStories,
+    handleGetAllUserRecommedationsStories
 }
