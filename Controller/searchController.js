@@ -15,7 +15,7 @@ async function handleSearchStory(req, res) {
 
 async function handleAddRemoveRecentSearched(req, res) {
     try {
-        const userId = req.data.loggedInUserData._id;
+        const userId = req.user.userData._id;
         const { searchTerm } = req.body;
         const userSearches = await RecentSearch.find({ userId });
         if(userSearches.length >= 5){
@@ -36,7 +36,7 @@ async function handleAddRemoveRecentSearched(req, res) {
 
 async function handleGetAllRecentSearched(req, res) {
     try {
-        const userId = req.data.loggedInUserData._id;
+        const userId = req.user.userData._id;
         const userSearches = await RecentSearch.find({ userId });
         if(userSearches.length < 0){
             return res.status(200).json({ userSearches });

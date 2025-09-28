@@ -1,15 +1,18 @@
 const jwt = require('jsonwebtoken');
 const secret = "auditale1234567890";
 
-function setUser(loggedInUserData){
+function setUser(userData) {
     return jwt.sign({
-        loggedInUserData
-    }, secret); 
+        userData
+    }, secret, { expiresIn: '7d' });
 }
 
-function getUser(uid) {
-    if(!uid) return res.json({ "error": "Please provide the uid" });
-    return jwt.verify(uid, secret);
+function getUser(token) {
+    try {
+        return jwt.verify(token, secret);
+    } catch (err) {
+        return null;
+    }
 }
 
 module.exports = {

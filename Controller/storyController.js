@@ -20,7 +20,7 @@ async function handleAddStory(req, res) {
 
 async function handleGetAllStory(req, res) {
     try {
-        const userId = req.data.loggedInUserData._id;
+        const userId = req.user.userData._id;
         const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
         const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
         
@@ -49,7 +49,7 @@ async function handleGetAllStory(req, res) {
 async function handleGetAllCategoryBasedStory(req, res) {
     try {
         const { categoryId } = req.body;
-        const userId = req.data.loggedInUserData._id;
+        const userId = req.user.userData._id;
 
         const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
         const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
@@ -173,7 +173,7 @@ async function handleGetTrialStories(req, res) {
 
 async function handleGetAllRelatedStories(req, res) {
     try {
-        const userId = req.data.loggedInUserData._id;
+        const userId = req.user.userData._id;
         const { currentStoryId } = req.body;
         const storyData = await Story.find({ _id: currentStoryId }, { _id: 0, categoryId: 1, tags: 1 });
 

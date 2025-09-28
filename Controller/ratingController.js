@@ -2,7 +2,7 @@ const Rating = require("../Models/ratingModel");
 
 async function handleAddRatings(req, res) {
     try {
-        const userId = req.data.loggedInUserData._id;
+        const userId = req.user.userData._id;
         const { storyId, starCount } = req.body;
         
         if(starCount <= 5 && starCount >= 1){

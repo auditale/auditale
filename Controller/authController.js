@@ -10,7 +10,17 @@ async function handleRegisterUser(req, res) {
         const registerUserData = await User.create({ username, email, password });
 
         if(!registerUserData) return res.status(400).json({ error: "User is not generated. Please try again later" });
-        return res.status(201).json(registerUserData);
+       
+        const token = setUser(registerUserData);
+        
+        return res.status(200).json({
+            message: "Register successful",
+            token,
+            registerUserData: {
+                id: registerUserData._id,
+                email: registerUserData.email
+            }
+        });
         
     } catch (error) {
         console.error(error);
@@ -26,11 +36,16 @@ async function handleLoginUser(req, res) {
 
         if(!loggedInUserData) return res.status(401).json({ error: "User not found. Please check the credential or register with us." });;
 
-        // perform the stateless authentication
         const token = setUser(loggedInUserData);
-        res.cookie('uid', token);
         
-        return res.status(201).json(loggedInUserData);
+        return res.status(200).json({
+            message: "Login successful",
+            token,
+            loggedInUserData: {
+                id: loggedInUserData._id,
+                email: loggedInUserData.email
+            }
+        });
 
     } catch (error) {
         console.error(error);
@@ -39,7 +54,7 @@ async function handleLoginUser(req, res) {
 }
 
 async function handleUserProfile(req, res) {
-    const userId = req.data.loggedInUserData._id;
+    const userId = req.user.userData._id;
     const profileData = await Profile.aggregate([
             {
                 $match: {
@@ -73,7 +88,7 @@ async function handleUserProfile(req, res) {
 }
 
 async function handleAddUpdateProfileImage(req, res) {
-    const userId = req.data.loggedInUserData._id;
+    const userId = req.user.userData._id;
 
     const { profileImage } = req.body;
     if(!profileImage) return res.status(400).json({ error: "Please provide the url for the user profile picture." });
@@ -93,7 +108,7 @@ async function handleAddUpdateProfileImage(req, res) {
 }
 
 async function handleUpdateProfile(req, res) {
-    const userId = req.data.loggedInUserData._id;
+    const userId = req.user.userData._id;
     const updates = {};
 
     if (req.body.username) updates.username = req.body.username;
@@ -115,7 +130,7 @@ async function handleUpdateProfile(req, res) {
 
 async function handleUpdatePassword(req, res) {
     try{
-        const userId = req.data.loggedInUserData._id;
+        const userId = req.user.userData._id;
         const { oldPassword, newPassword } = req.body;
         const updates = {};
 

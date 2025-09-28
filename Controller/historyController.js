@@ -5,7 +5,7 @@ const ObjectId = mongoose.Types.ObjectId;
 
 async function handleGetHistory(req, res) {
     try {
-        const userId = req.data.loggedInUserData._id;
+        const userId = req.user.userData._id;
         
         const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
         const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
@@ -58,7 +58,7 @@ async function handleGetHistory(req, res) {
 
 async function handleAddHistory(req, res) {
     try {
-        const userId = req.data.loggedInUserData._id;
+        const userId = req.user.userData._id;
         const { storyId } = req.body;
         
         const HistoryData = await History.findOneAndUpdate(
