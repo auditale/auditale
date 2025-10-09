@@ -29,13 +29,15 @@ async function handleRegisterUser(req, res) {
 }
 
 async function handleLoginUser(req, res) {
-
     try {
         const { email, password } = req.body;
+        const loggedInUserEmail = await User.findOne({ email });
+        if(!loggedInUserEmail) return res.status(401).json({ error: "User not found. Please check the email." });
+
+        const loggedInUserPassword = await User.findOne({ password });
+        if(!loggedInUserPassword) return res.status(401).json({ error: "User not found. Please check the password." });
+
         const loggedInUserData = await User.findOne({ email, password });
-
-        if(!loggedInUserData) return res.status(401).json({ error: "User not found. Please check the credential or register with us." });;
-
         const token = setUser(loggedInUserData);
         
         return res.status(200).json({
@@ -55,7 +57,14 @@ async function handleLoginUser(req, res) {
 
 async function handleUserProfile(req, res) {
     const userId = req.user.userData._id;
-    const profileData = await Profile.aggregate([
+    const userProfileData = await Profile.findOne({ userId });
+
+    if(!userProfileData){
+        const finalUserProfileData = await User.findOne({ _id: userId }, { username: 1, email: 1, profileImage:"not found", _id: 0 });
+        if(!finalUserProfileData) return res.status(400).json({ error: "Profile data is not found. Please add the data first." });
+        return res.status(200).json(finalUserProfileData);
+    }else{
+        const finalUserProfileData = await Profile.aggregate([
             {
                 $match: {
                     "userId": new ObjectId(userId)
@@ -78,13 +87,13 @@ async function handleUserProfile(req, res) {
                     userId: 1,
                     username: "$userdata.username",
                     email: "$userdata.email",
-                    password: "$userdata.password" 
+                    profileImage: 1
                 }
             }
-        ])
-
-    if(!profileData) return res.status(400).json({ error: "Profile data is not found. Please add the data first." });
-    return res.status(201).json(profileData);
+        ]);
+        if(!finalUserProfileData) return res.status(400).json({ error: "Profile data is not found. Please add the data first." });
+        return res.status(200).json(finalUserProfileData);
+    }
 }
 
 async function handleAddUpdateProfileImage(req, res) {

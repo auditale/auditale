@@ -80,7 +80,45 @@ async function handleAddHistory(req, res) {
     }
 }
 
+async function handleGetRecentlyAccessedStories(req, res) {
+    try {
+        const userId = req.user.userData._id;
+        const getRecentlyAccessed = await History.aggregate([
+            {   $match: {   "userId": new ObjectId(userId)  }   }, 
+            {   $sort: {    createdAt: -1   }   },
+            {   $limit: 10 },
+            // join with history - story
+            {   $lookup:{
+                    from: "stories",
+                    localField: "storyId",
+                    foreignField: "_id",
+                    as: "storydata"
+                }
+            }, {   $unwind: {
+                    path: "$storydata",
+                    preserveNullAndEmptyArrays: true
+                }
+            }, {   $project: {
+                    _id: 1,
+                    storyTitle: "$storydata.storyTitle",
+                    storyDescription: "$storydata.storyDescription",
+                    storyImage: "$storydata.storyImage",
+                    storyURL: "$storydata.storyURL",
+                }
+            }
+        ])
+
+        if(getRecentlyAccessed.length == 0) return res.status(400).json({ error: "Record not found, please play some stories first." });    
+        return res.status(200).json(getRecentlyAccessed);
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+}
+
 module.exports = {
     handleGetHistory,
-    handleAddHistory
+    handleAddHistory,
+    handleGetRecentlyAccessedStories
 }

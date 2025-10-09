@@ -101,6 +101,50 @@ async function handleGetAllCategoryBasedStory(req, res) {
     }
 }
 
+async function handleGetAllUserFavouriteStory(req, res) {
+    try {
+        const userId = req.user.userData._id;
+        const finalAllStoryWithUserFavourite = await Favourite.aggregate([
+                                    {
+                                        $match: {
+                                            "userId": new ObjectId(userId)
+                                        }
+                                    },
+                                    // join with favourite - story
+                                    {   $lookup:{
+                                            from: "stories",
+                                            localField: "storyId",
+                                            foreignField: "_id",
+                                            as: "storydata"
+                                        }
+                                    },
+                                    {   $unwind: {
+                                            path: "$storydata",
+                                            preserveNullAndEmptyArrays: true
+                                        }
+                                    },
+                                    {   $project: {
+                                            userId: 1,
+                                            storyTitle: "$storydata.storyTitle",
+                                            storyDescription: "$storydata.storyDescription",
+                                            storyImage: "$storydata.storyImage",
+                                            storyURL: "$storydata.storyURL",
+                                            categoryId: "$storydata.categoryId",
+                                            tags: "$storydata.tags",
+                                               
+                                        }
+                                    }
+                                ]);
+                                
+        if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No favourite stories found." });
+        return res.status(200).json(finalAllStoryWithUserFavourite);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+}
+
+
 async function handleGetAllGenreWithStories(req, res) {
     try {
         const allCategories = await Category.find();
@@ -231,5 +275,6 @@ module.exports = {
     handleGetAllGenreWithStories,
     handleGetTrialStories,
     handleGetAllRelatedStories,
-    handleGetAllUserRecommedationsStories
+    handleGetAllUserRecommedationsStories,
+    handleGetAllUserFavouriteStory
 }
