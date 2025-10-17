@@ -1,4 +1,5 @@
 const Story = require('../Models/storyModel');
+const History = require('../Models/historyModel');
 const Favourite = require('../Models/favouriteModel');
 const Category = require('../Models/categoryModel');
 const Rating = require('../Models/ratingModel');
@@ -144,7 +145,6 @@ async function handleGetAllUserFavouriteStory(req, res) {
     }
 }
 
-
 async function handleGetAllGenreWithStories(req, res) {
     try {
         const allCategories = await Category.find();
@@ -261,7 +261,64 @@ async function handleGetAllRelatedStories(req, res) {
 
 async function handleGetAllUserRecommedationsStories(req, res) {
     try {
-        console.log("handleGetAllUserRecommedationsStories")
+        const userId = req.user.userData._id;
+
+        // took genre of highest 15 played stories
+        const finalHighestPlayedStories = await History.aggregate([{
+                                        $match: { userId: new ObjectId(userId) } },
+                                    {   $group: { _id: "$storyId", count: { $sum: 1 } } },
+                                    {   $sort: { count: -1 } },
+                                    {   $limit: 15 },
+                                    {   $lookup: {
+                                            from: 'stories',
+                                            localField: '_id',
+                                            foreignField: '_id',
+                                            as: 'sortingData',
+                                        }
+                                    },
+                                    {   $project: {
+                                            _id: 0,
+                                            storyGenre: { $arrayElemAt: ["$sortingData.storyGenre", 0] }
+                                        }
+                                    }
+                                ]);
+
+        // took genre of stories who received greater than or equal 3 stars from the logged in users
+        const finalHighestRatingStories = await Rating.aggregate([{   
+                                        $match: { 
+                                            userId: new ObjectId(userId),
+                                            starCount: { $gte: 3 }  
+                                        }   
+                                    },
+                                    {   $sort: {
+                                            sortingCount: -1
+                                        }
+                                    },
+                                    {   $lookup: {
+                                            from: 'stories',
+                                            localField: 'storyId',
+                                            foreignField: '_id',
+                                            as: 'sortingData',
+                                        }
+                                    },
+                                    {   $project: {
+                                            _id: 0,
+                                            storyGenre: { $arrayElemAt: ["$sortingData.storyGenre", 0] }
+                                        }
+                                    }
+                                ]);
+
+        const finalFilteredStories = [...finalHighestPlayedStories, ...finalHighestRatingStories];
+        const finalUniqueGenre = [...new Set(finalFilteredStories.map(item => item.storyGenre))];
+
+        // Explanation:
+        // finalFilteredStories.map(item => item.storyGenre) extracts all storyGenre values into an array.
+        // new Set(...) removes duplicates because a Set only keeps unique values.
+        // [...new Set(...)] converts the Set back into an array.
+
+        const finalStoryResult = await Story.find({ storyGenre: finalUniqueGenre[0] });
+        return res.status(200).json(finalStoryResult);
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Internal server error." });

@@ -61,18 +61,20 @@ async function handleAddHistory(req, res) {
         const userId = req.user.userData._id;
         const { storyId } = req.body;
         
-        const HistoryData = await History.findOneAndUpdate(
-            { userId, storyId }, // find history by user id and story id
-            { userId, storyId }, // update or insert the history data
-            {
-                upsert: true,
-                new: true, // return the updated doc
-                setDefaultsOnInsert: true
-            }
-        );
+        const historyData = await History.create({ storyId, userId });
+        
+        // const historyData = await History.findOneAndUpdate(
+        //     { userId, storyId }, // find history by user id and story id
+        //     { userId, storyId }, // update or insert the history data
+        //     {
+        //         upsert: true,
+        //         new: true, // return the updated doc
+        //         setDefaultsOnInsert: true
+        //     }
+        // );
 
-        if(!HistoryData) return res.status(400).json({ error: "History data is not generated. Please try again later" });
-        return res.status(201).json({ message:"History data add or updated successfully." });
+        if(!historyData) return res.status(400).json({ error: "History data is not generated. Please try again later" });
+        return res.status(201).json({ message:"History data added successfully." });
 
     } catch (error) {
         console.error(error);
