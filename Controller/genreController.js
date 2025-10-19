@@ -2,8 +2,8 @@ const Genre = require('../Models/genreModel');
 
 async function handleAddGenre(req, res) {
     try {
-        const { genreName, genreDesc} = req.body;
-        const genreData = await Genre.create({genreName, genreDesc});
+        const { genreName, genreDesc, genreImage} = req.body;
+        const genreData = await Genre.create({genreName, genreDesc, genreImage});
 
         if(!genreData) return res.status(400).json({ error: "Cateogry is not created. Please try again later" });
         return res.status(201).json({ "message":"Genre inserted successfully" });

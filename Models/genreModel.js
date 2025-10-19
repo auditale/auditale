@@ -9,6 +9,10 @@ const genreSchema = new mongoose.Schema({
     genreDesc:{
         type: String,
         required: true,
+    },
+    genreImage:{
+        type: String,
+        required: true,
     }
 }, { timestamps: true });
 
