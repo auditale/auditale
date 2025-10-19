@@ -97,23 +97,28 @@ async function handleUserProfile(req, res) {
 }
 
 async function handleAddUpdateProfileImage(req, res) {
-    const userId = req.user.userData._id;
+    try {
+        const userId = req.user.userData._id;
+        const { profileImage } = req.body;
+        if(!profileImage) return res.status(400).json({ error: "Please provide the url for the user profile picture." });
 
-    const { profileImage } = req.body;
-    if(!profileImage) return res.status(400).json({ error: "Please provide the url for the user profile picture." });
+        const profileData = await Profile.findOneAndUpdate(
+        { userId }, // find profile by user id
+        { userId, profileImage }, // update or insert the profile data
+        {
+            upsert: true,
+            new: true, // return the updated doc
+            setDefaultsOnInsert: true
+        }
+        );
 
-    const profileData = await Profile.findOneAndUpdate(
-      { userId }, // find profile by user id
-      { userId, profileImage }, // update or insert the profile data
-      {
-        upsert: true,
-        new: true, // return the updated doc
-        setDefaultsOnInsert: true
-      }
-    );
-
-    if(!profileData) return res.status(400).json({ error: "Profile data is not generated. Please try again later" });
-    return res.status(201).json({ message:"profile image add or updated successfully." });
+        if(!profileData) return res.status(400).json({ error: "Profile data is not generated. Please try again later" });
+        return res.status(201).json({ message:"profile image add or updated successfully." });
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
 }
 
 async function handleUpdateProfile(req, res) {
