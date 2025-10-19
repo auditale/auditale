@@ -5,7 +5,7 @@ async function handleAddGenre(req, res) {
         const { genreName, genreDesc, genreImage} = req.body;
         const genreData = await Genre.create({genreName, genreDesc, genreImage});
 
-        if(!genreData) return res.status(400).json({ error: "Cateogry is not created. Please try again later" });
+        if(!genreData) return res.status(400).json({ error: "Genre is not created. Please try again later" });
         return res.status(201).json({ "message":"Genre inserted successfully" });
     } catch (error) {
         console.error(error);
@@ -17,7 +17,7 @@ async function handleGetAllGenres(req, res) {
     try {
         const allGenres = await Genre.find({});
 
-        if(!allGenres) return res.status(400).json({ error: "Cateogry is not found. Please add a new one." });
+        if(!allGenres) return res.status(400).json({ error: "Genre is not found. Please add a new one." });
         return res.status(200).json(allGenres);
     } catch (error) {
         console.error(error);
