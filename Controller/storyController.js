@@ -1,15 +1,15 @@
 const Story = require('../Models/storyModel');
 const History = require('../Models/historyModel');
 const Favourite = require('../Models/favouriteModel');
-const Category = require('../Models/categoryModel');
+const Genre = require('../Models/genreModel');
 const Rating = require('../Models/ratingModel');
 const { ObjectId } = require('mongoose').Types;
 
 async function handleAddStory(req, res) {
     try {
-        const { storyTitle, storyDescription, storyImage, storyURL, categoryId} = req.body;
-        const categoryIds = new ObjectId(categoryId);
-        const StoryData = await Story.create({storyTitle, storyDescription, storyImage, storyURL, categoryId: categoryIds});
+        const { storyTitle, storyDescription, storyImage, storyURL, genreId} = req.body;
+        const genreIds = new ObjectId(genreId);
+        const StoryData = await Story.create({storyTitle, storyDescription, storyImage, storyURL, genreId: genreIds});
 
         if(!StoryData) return res.status(400).json({ error: "Story is not created. Please try again later" });
         return res.status(201).json({ "message":"Story inserted successfully" });
@@ -39,7 +39,7 @@ async function handleGetAllStory(req, res) {
                                     }
                                 ]);
                                 
-        if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category." });
+        if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this genre." });
         return res.status(200).json(finalAllStoryWithUserFavourite);
     } catch (error) {
         console.error(error);
@@ -47,19 +47,19 @@ async function handleGetAllStory(req, res) {
     }
 }
 
-async function handleGetAllCategoryBasedStory(req, res) {
+async function handleGetAllGenreBasedStory(req, res) {
     try {
-        const { categoryId } = req.params;
+        const { genreId } = req.params;
         const userId = req.user.userData._id;
 
         const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
         const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
 
-        if(categoryId != ""){
-            const finalCategoryId = new ObjectId(categoryId);
+        if(genreId != ""){
+            const finalGenreId = new ObjectId(genreId);
             const finalAllStoryWithUserFavourite = await Story.aggregate([{
                                         $match: {
-                                            categoryId: finalCategoryId
+                                            genreId: finalGenreId
                                         }
                                     },
                                     {
@@ -76,7 +76,7 @@ async function handleGetAllCategoryBasedStory(req, res) {
                                 ]);
 
 
-            if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category." });
+            if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this genre." });
             return res.status(200).json(finalAllStoryWithUserFavourite);
         }else{
             const finalAllStoryWithUserFavourite = await Story.aggregate([
@@ -93,7 +93,7 @@ async function handleGetAllCategoryBasedStory(req, res) {
                                     }
                                 ]);
 
-            if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category." });
+            if(finalAllStoryWithUserFavourite.length  == 0) return res.status(200).json({ "error":"No stories found associated with this genre." });
             return res.status(200).json(finalAllStoryWithUserFavourite);
         }
     } catch (error) {
@@ -154,28 +154,28 @@ async function handleGetAllUserFavouriteStory(req, res) {
 
 async function handleGetAllGenreWithStories(req, res) {
     try {
-        const allCategories = await Category.find();
-        const finalallCategories = allCategories.map(item => item._id);
+        const allGenres = await Genre.find();
+        const finalallGenres = allGenres.map(item => item._id);
 
-        const getThreeStoriesOfEachCategory = await Story.find({ categoryId: { $in: finalallCategories } })
+        const getThreeStoriesOfEachGenre = await Story.find({ genreId: { $in: finalallGenres } })
         .sort({ createdAt: -1 })  // Sort by 'createdAt' descending (latest first)
         .limit(3);
 
-        // Function to group stories by categoryId
-        const groupStoriesByCategory = (getThreeStoriesOfEachCategory) => {
-        return getThreeStoriesOfEachCategory.reduce((acc, item) => {
-            const { categoryId } = item;
-            if (!acc[categoryId]) {
-                acc[categoryId] = [];
+        // Function to group stories by genreId
+        const groupStoriesByGenre = (getThreeStoriesOfEachGenre) => {
+        return getThreeStoriesOfEachGenre.reduce((acc, item) => {
+            const { genreId } = item;
+            if (!acc[genreId]) {
+                acc[genreId] = [];
             }
-            acc[categoryId].push(item);
+            acc[genreId].push(item);
             return acc;
         }, {});
         };
 
         // Group stories
-        const finalGroupStoriesByCategory = groupStoriesByCategory(getThreeStoriesOfEachCategory);
-        return res.status(200).json(finalGroupStoriesByCategory);
+        const finalGroupStoriesByGenre = groupStoriesByGenre(getThreeStoriesOfEachGenre);
+        return res.status(200).json(finalGroupStoriesByGenre);
         
     } catch (error) {
         console.error(error);
@@ -226,7 +226,7 @@ async function handleGetAllRelatedStories(req, res) {
     try {
         const userId = req.user.userData._id;
         const { currentStoryId } = req.body;
-        const storyData = await Story.find({ _id: currentStoryId }, { _id: 0, categoryId: 1, tags: 1 });
+        const storyData = await Story.find({ _id: currentStoryId }, { _id: 0, genreId: 1, tags: 1 });
 
         const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
         const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
@@ -246,7 +246,7 @@ async function handleGetAllRelatedStories(req, res) {
                                                     {
                                                         $match: {
                                                             $or: [
-                                                                {categoryId: storyData[0]['categoryId']}, 
+                                                                {genreId: storyData[0]['genreId']}, 
                                                                 {tags: storyData[0]['tags']}
                                                             ],
                                                             _id: { $ne: new ObjectId(currentStoryId) }
@@ -257,7 +257,7 @@ async function handleGetAllRelatedStories(req, res) {
                                                     }
                                                 ]);
         
-        if(finalStoryData.length  == 0) return res.status(200).json({ "error":"No stories found associated with this category and tags." });
+        if(finalStoryData.length  == 0) return res.status(200).json({ "error":"No stories found associated with this genre and tags." });
         return res.status(200).json(finalStoryData);
 
     } catch (error) {
@@ -335,7 +335,7 @@ async function handleGetAllUserRecommedationsStories(req, res) {
 module.exports = {
     handleAddStory,
     handleGetAllStory,
-    handleGetAllCategoryBasedStory,
+    handleGetAllGenreBasedStory,
     handleGetAllGenreWithStories,
     handleGetTrialStories,
     handleGetAllRelatedStories,

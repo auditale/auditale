@@ -2,8 +2,8 @@ const express = require('express');
 const { testingBaseURL } = require('./Controller/testingController');
 const { handleAddUpdateProfileImage } = require('./Controller/googleController');
 const { handleLoginUser, handleRegisterUser, handleUserProfile, handleUpdateProfile, handleUpdatePassword } = require('./Controller/authController');
-const { handleAddCategory, handleGetAllCategories } = require('./Controller/categoryController');
-const { handleAddStory, handleGetAllStory, handleGetAllCategoryBasedStory, handleGetAllGenreWithStories, handleGetTrialStories, handleGetAllRelatedStories, handleGetAllUserRecommedationsStories, handleGetAllUserFavouriteStory } = require('./Controller/storyController');
+const { handleAddGenre, handleGetAllGenres } = require('./Controller/genreController');
+const { handleAddStory, handleGetAllStory, handleGetAllGenreBasedStory, handleGetAllGenreWithStories, handleGetTrialStories, handleGetAllRelatedStories, handleGetAllUserRecommedationsStories, handleGetAllUserFavouriteStory } = require('./Controller/storyController');
 const { handleAddRemoveFavourite } = require('./Controller/favouriteController');
 const { handleAddRatings } = require('./Controller/ratingController');
 const { validateStory } = require('./Validators/storyValidator');
@@ -11,7 +11,7 @@ const { handleAddHistory, handleGetHistory, handleGetRecentlyAccessedStories } =
 const { handleSearchStory, handleAddRemoveRecentSearched, handleGetAllRecentSearched } = require('./Controller/searchController');
 const { handleAuthUser } = require('./Middlewares/authMiddleware');
 const { validateLoginUser, validateRegisterUser } = require('./Validators/userValidator');
-const { validateCategory } = require('./Validators/categoryValidator');
+const { validateGenre } = require('./Validators/genreValidator');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 
@@ -49,15 +49,15 @@ app.post('/addProfileImage', handleAuthUser, upload.single('profileImage'), hand
 app.post('/updateProfile', handleAuthUser, handleUpdateProfile);
 app.post('/updatePassword', handleAuthUser, handleUpdatePassword);
 
-// Category Routes
-app.post('/addCategory', validateCategory, handleAddCategory);
-app.get('/getCategories', handleAuthUser, handleGetAllCategories);
+// Genre Routes
+app.post('/addGenre', validateGenre, handleAddGenre);
+app.get('/getGenres', handleAuthUser, handleGetAllGenres);
 
 // Story Routes
 app.get('/trailStories', handleGetTrialStories);
 app.post('/addStory', handleAuthUser, validateStory, handleAddStory);
 app.get('/getAllStory', handleAuthUser, handleGetAllStory);
-app.get('/getCategoryBasedStory', handleAuthUser, handleGetAllCategoryBasedStory);
+app.get('/getGenreBasedStory', handleAuthUser, handleGetAllGenreBasedStory);
 app.get('/getAllGenreWithStories', handleAuthUser, handleGetAllGenreWithStories);
 app.get('/relatedStories', handleAuthUser, handleGetAllRelatedStories);
 app.get('/userRecommendationsStories', handleAuthUser, handleGetAllUserRecommedationsStories);

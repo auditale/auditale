@@ -1,15 +1,15 @@
 const { body, validationResult } = require('express-validator');
-const Category = require('../Models/categoryModel');
+const Genre = require('../Models/genreModel');
 
-const validateCategory = [
+const validateGenre = [
     // Validation rules
 
-    body('categoryName')
-        .notEmpty().withMessage('Category Name is required').bail()
+    body('genreName')
+        .notEmpty().withMessage('Genre Name is required').bail()
         .custom(async (value) => {
-            const category = await Category.findOne({ categoryName: value });
-            if (category) {
-                throw new Error('Category name already in use, please add a new category name');
+            const genre = await Genre.findOne({ genreName: value });
+            if (genre) {
+                throw new Error('Genre name already in use, please add a new genre name');
             }
         }),
 
@@ -26,5 +26,5 @@ const validateCategory = [
 ];
 
 module.exports = {
-    validateCategory
+    validateGenre
 }

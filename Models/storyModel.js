@@ -22,9 +22,9 @@ const storySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    categoryId:{
+    genreId:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category', // This should match the name of your Category model
+        ref: 'Genre', // This should match the name of your Genre model
         required: true
     }
 }, { timestamps: true });
