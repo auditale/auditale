@@ -1,6 +1,7 @@
 const express = require('express');
 const { testingBaseURL } = require('./Controller/testingController');
-const { handleLoginUser, handleRegisterUser, handleUserProfile, handleAddUpdateProfileImage, handleUpdateProfile, handleUpdatePassword } = require('./Controller/authController');
+const { handleAddUpdateProfileImage } = require('./Controller/googleController');
+const { handleLoginUser, handleRegisterUser, handleUserProfile, handleUpdateProfile, handleUpdatePassword } = require('./Controller/authController');
 const { handleAddCategory, handleGetAllCategories } = require('./Controller/categoryController');
 const { handleAddStory, handleGetAllStory, handleGetAllCategoryBasedStory, handleGetAllGenreWithStories, handleGetTrialStories, handleGetAllRelatedStories, handleGetAllUserRecommedationsStories, handleGetAllUserFavouriteStory } = require('./Controller/storyController');
 const { handleAddRemoveFavourite } = require('./Controller/favouriteController');
@@ -12,6 +13,7 @@ const { handleAuthUser } = require('./Middlewares/authMiddleware');
 const { validateLoginUser, validateRegisterUser } = require('./Validators/userValidator');
 const { validateCategory } = require('./Validators/categoryValidator');
 const cookieParser = require('cookie-parser');
+const multer = require('multer');
 
 const app = express();
 const port = 3000;
@@ -22,6 +24,10 @@ app.use(express.static(path.join(__dirname, 'public'))); // Assuming audio files
 app.use(express.json()); // for JSON payloads
 app.use(express.urlencoded({ extended: true })); // for form submissions (x-www-form-urlencoded)
 app.use(cookieParser());
+
+// Set up multer to handle file uploads
+const multerStorage = multer.memoryStorage();
+const upload = multer({ storage: multerStorage });
 
 app.get('/', testingBaseURL);
 
@@ -38,7 +44,8 @@ connectDB();
 app.post('/register', validateRegisterUser, handleRegisterUser);
 app.post('/login', validateLoginUser, handleLoginUser);
 app.get('/getProfile', handleAuthUser, handleUserProfile);
-app.post('/addProfileImage', handleAuthUser, handleAddUpdateProfileImage);
+// app.post('/addProfileImage', handleAuthUser, handleAddUpdateProfileImage);
+app.post('/addProfileImage', handleAuthUser, upload.single('profileImage'), handleAddUpdateProfileImage);
 app.post('/updateProfile', handleAuthUser, handleUpdateProfile);
 app.post('/updatePassword', handleAuthUser, handleUpdatePassword);
 

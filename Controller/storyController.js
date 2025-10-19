@@ -49,7 +49,7 @@ async function handleGetAllStory(req, res) {
 
 async function handleGetAllCategoryBasedStory(req, res) {
     try {
-        const { categoryId } = req.body;
+        const { categoryId } = req.params;
         const userId = req.user.userData._id;
 
         const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
@@ -126,13 +126,20 @@ async function handleGetAllUserFavouriteStory(req, res) {
                                     },
                                     {   $project: {
                                             userId: 1,
+                                            ageRange: "$storydata.ageRange",
+                                            audioURL: "$storydata.audioURL",
+                                            imageURL: "$storydata.imageURL",
+                                            createdAt: "$storydata.createdAt",
+                                            storyTags: "$storydata.storyTags",
+                                            storyText: "$storydata.storyText",
+                                            storyGenre: "$storydata.storyGenre",
+                                            storyMoral: "$storydata.storyMoral",
+                                            storyTheme: "$storydata.storyTheme",
                                             storyTitle: "$storydata.storyTitle",
-                                            storyDescription: "$storydata.storyDescription",
-                                            storyImage: "$storydata.storyImage",
-                                            storyURL: "$storydata.storyURL",
-                                            categoryId: "$storydata.categoryId",
-                                            tags: "$storydata.tags",
-                                               
+                                            audioLength: "$storydata.audioLength",
+                                            storySummary: "$storydata.storySummary",
+                                            thumbnailURL: "$storydata.thumbnailURL",
+                                            storyLanguage: "$storydata.storyLanguage"
                                         }
                                     }
                                 ]);
