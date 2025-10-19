@@ -15,7 +15,7 @@ async function handleAddCategory(req, res) {
 
 async function handleGetAllCategories(req, res) {
     try {
-        const allCategories = await Category.find({}, { categoryName: 1, categoryDesc: 1, _id: 0 });
+        const allCategories = await Category.find({});
 
         if(!allCategories) return res.status(400).json({ error: "Cateogry is not found. Please add a new one." });
         return res.status(200).json(allCategories);
