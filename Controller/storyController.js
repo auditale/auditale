@@ -49,17 +49,17 @@ async function handleGetAllStory(req, res) {
 
 async function handleGetAllGenreBasedStory(req, res) {
     try {
-        const { genreId } = req.params;
+        const genreName = req.query.genreName;
         const userId = req.user.userData._id;
 
         const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
+
         const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
 
-        if(genreId != ""){
-            const finalGenreId = new ObjectId(genreId);
+        if(genreName != ""){
             const finalAllStoryWithUserFavourite = await Story.aggregate([{
                                         $match: {
-                                            genreId: finalGenreId
+                                            storyGenre: genreName
                                         }
                                     },
                                     {
