@@ -126,6 +126,7 @@ async function handleGetAllUserFavouriteStory(req, res) {
                                     },
                                     {   $project: {
                                             userId: 1,
+                                            storyId: "$storydata._id",
                                             ageRange: "$storydata.ageRange",
                                             audioURL: "$storydata.audioURL",
                                             imageURL: "$storydata.imageURL",
