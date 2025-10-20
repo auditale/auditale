@@ -83,7 +83,7 @@ async function handleUserProfile(req, res) {
             expires: Date.now() + 1000 * 60 * 15, // URL valid for 15 minutes
         };
 
-        const [signedUrl] = storage.bucket('testing-auditale').file(userProfileData.profileImage).getSignedUrl(options);
+        const [signedUrl] = await storage.bucket('testing-auditale').file(userProfileData.profileImage).getSignedUrl(options);
 
         const finalUserProfileData = await Profile.aggregate([
             {
