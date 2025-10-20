@@ -7,7 +7,7 @@ const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 
 const projectId = 'tactical-hope-475616-q7';
-const keyFilename = path.join(__dirname, '..', 'Google_storage', 'tactical-hope-475616-q7-4834aed0dbb1.json');
+const keyFilename = path.join(__dirname, '..', 'Google_storage', 'tactical-hope-475616-q7-4bb9908b0051.json');
 
 // Initialize Google Cloud Storage
 const storage = new Storage({ projectId, keyFilename });
@@ -83,7 +83,7 @@ async function handleUserProfile(req, res) {
             expires: Date.now() + 1000 * 60 * 15, // URL valid for 15 minutes
         };
 
-        const [signedUrl] = await storage.bucket('testing-auditale').file(userProfileData.profileImage).getSignedUrl(options);
+        const [signedUrl] = await storage.bucket('testing-auditale-1').file(userProfileData.profileImage).getSignedUrl(options);
 
         const finalUserProfileData = await Profile.aggregate([
             {

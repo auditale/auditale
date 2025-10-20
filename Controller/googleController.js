@@ -3,13 +3,13 @@ const Profile = require('../Models/profileModel');
 const path = require('path');
 
 const projectId = 'tactical-hope-475616-q7';
-const keyFilename = path.join(__dirname, '..', 'Google_storage', 'tactical-hope-475616-q7-4834aed0dbb1.json');
+const keyFilename = path.join(__dirname, '..', 'Google_storage', 'tactical-hope-475616-q7-4bb9908b0051.json');
 
 // Initialize Google Cloud Storage
 const storage = new Storage({ projectId, keyFilename });
 
 // Define the bucket name
-const bucket = storage.bucket('testing-auditale');
+const bucket = storage.bucket('testing-auditale-1');
 
 async function handleAddUpdateProfileImage(req, res) {
     try {
