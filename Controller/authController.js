@@ -3,6 +3,14 @@ const { setUser } = require('../Auth/userAuth');
 const Profile = require('../Models/profileModel');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
+const { Storage } = require('@google-cloud/storage');
+const path = require('path');
+
+const projectId = 'tactical-hope-475616-q7';
+const keyFilename = path.join(__dirname, '..', 'Google_storage', 'tactical-hope-475616-q7-4834aed0dbb1.json');
+
+// Initialize Google Cloud Storage
+const storage = new Storage({ projectId, keyFilename });
 
 async function handleRegisterUser(req, res) {
     try {
@@ -68,6 +76,15 @@ async function handleUserProfile(req, res) {
         if(!finalUserProfileData) return res.status(400).json({ error: "Profile data is not found. Please add the data first." });
         return res.status(200).json(finalUserProfileData);
     }else{
+
+        const options = {
+            version: 'v4',
+            action: 'read',
+            expires: Date.now() + 1000 * 60 * 15, // URL valid for 15 minutes
+        };
+
+        const [signedUrl] = storage.bucket('testing-auditale').file(userProfileData.profileImage).getSignedUrl(options);
+
         const finalUserProfileData = await Profile.aggregate([
             {
                 $match: {
@@ -91,7 +108,7 @@ async function handleUserProfile(req, res) {
                     userId: 1,
                     username: "$userdata.username",
                     email: "$userdata.email",
-                    profileImage: 1
+                    profileImage: signedUrl
                 }
             }
         ]);

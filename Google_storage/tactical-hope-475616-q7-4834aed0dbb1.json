@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "tactical-hope-475616-q7",
+  "private_key_id": "4834aed0dbb1d6838b742fff44445fa82b8573de",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCi5UXurxbPEqX4\n7bN+fAJdhK+0mlXE6CqZgzg8xZcQeTl5lnnqRXFt7YAShIblfIM0D1P+6D0SZ3CR\npic06bfX9JhY9mw1fP/gvLdCEGfJwq9bEMXDU/vm0uYDXjgceMaSDfK7M1eIbUwB\nml4MNh3j70s00EPI3swzapQ9MriwpmY9Li3tVQsOwk2O0n3S1POzeNOY4jI373v3\nmC+xs+qBUEhMYNRVlV53/DQyHMmRsD0zDSpPvWQ3dOqZcFnL3EOusHUe1g+OFyYC\nIRhsOscxacnrHl4sAlQRahN6jTcjodKo7f8Bk4h7UKDvrC+tIjW7Rtu3NlPjEUiQ\nTvgniKYrAgMBAAECggEAIkoX7/fsWbeHt4A15fyttMjfAanxPwtOGFV+a5B+Tanu\n9tC9phprF6REbuF10e3lYnqNiF2TqYGbuRUcMK+4Et36idOJkLLY3BJtkxsH9fkk\n14sOziCqKHshjvjw39Fun0UPYOecV+wF8VpwzKpBnX78OkhS1IBNxM79GGrKZOi0\nGZHERFbZmpp0zBTUNWjf0GmgY1QmNy6SoDX456mYkZM7c+WvbFalMBELj9qyhuDq\nth86hLc93N+e3jjuO/Nza4Ivz+vnO3JdDAgTBcw+7ea+ziUU5HAZz29UzFtgJM4g\nlXVGwYv3W6hGjGfHCROnKX0P5nu4wVTAkvfIfZa+8QKBgQDT7gVTmbuM1EgLBjXF\nl9oLu2wq79Zerw4RfUqVng8qQvkoqT1nOnOXrtL81nEiKgw9Hx0QxHKD2ld8qThC\ns95wX5zNie4sBEF6o2SMrcZGatVuIVc0Xbe6Mfj4cj7sfx/D4hGEeqMEFY6GzNB1\nBoc1P8bBWblhGHXg275ZtLkYOwKBgQDExPEhP6O8yyBkKscK0nngcFhICTmrhSeQ\naWyGSu726Jo5cCRNO/nlwywP9GNSYrSgIR1DraVBeB2JS0DLTP7ZM5B653q+ifs4\nG0om0OeiY3lMhvwmx9ySxjFUtnLbkVMXs3Z1ciIcp067FcKttczLaEycKOL6eRPl\nYIPAJmO60QKBgQCfYach20DgRZm0qMPxySTTo+1SUTLv3EkBQC/CW69eAiYtvTGP\nm7bpATJtsbw9jE/N+8M5I/RXUvJurzi/eVQ1QMLFFRFIix7PY2gwIFQ4CwpeG7bg\njAargf+SoSDPbT9vamnwLubAIJIisI+pIvK2SjNon9i5u9KS+8+o2TBGlwKBgQCg\nL1O9pXk+cH5mDQ0Mmlvtgofb3Oa94yBaR/i5Orde+ezTZZ+n4HOHwGNWebWBlClH\nUq3oMqydp5Mj+cc9ueieGYQ9CcS66MlC27R59QcdA63zxs/vIjVGp2HxfLX0WVIz\nsT12TvvGJ83IL+bUU3PtA3OajQ56qaawzOl0u8vkgQKBgAWNqsr5tAcm54HXxSjq\nXs/mueSHLJIZmE3IFHJCynaRhyGs8c1scLRfuMH2j8623EeaRhz2HAbY8xe4DtN1\nRAkXRgaCmEygKgbwpYtay9eoZ3zY7eC0N61T1AzIZTLgPyweKBqX95sp+/zOdS0X\nTtblwBb3s2rTehFUsDZ7hMiH\n-----END PRIVATE KEY-----\n",
+  "client_email": "app-storage-access@tactical-hope-475616-q7.iam.gserviceaccount.com",
+  "client_id": "102311009019080999538",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/app-storage-access%40tactical-hope-475616-q7.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

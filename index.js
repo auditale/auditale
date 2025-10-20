@@ -1,6 +1,6 @@
 const express = require('express');
 const { testingBaseURL } = require('./Controller/testingController');
-const { handleAddUpdateProfileImage } = require('./Controller/googleController');
+const { handleAddUpdateProfileImage, uploadFile } = require('./Controller/googleController');
 const { handleLoginUser, handleRegisterUser, handleUserProfile, handleUpdateProfile, handleUpdatePassword } = require('./Controller/authController');
 const { handleAddGenre, handleGetAllGenres } = require('./Controller/genreController');
 const { handleAddStory, handleGetAllStory, handleGetAllGenreBasedStory, handleGetAllGenreWithStories, handleGetTrialStories, handleGetAllRelatedStories, handleGetAllUserRecommedationsStories, handleGetAllUserFavouriteStory } = require('./Controller/storyController');
