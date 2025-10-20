@@ -67,7 +67,7 @@ app.post('/addRemoveFav', handleAuthUser, handleAddRemoveFavourite);
 app.get('/getFavStories', handleAuthUser, handleGetAllUserFavouriteStory);
 
 // Search Routes
-app.post('/searchStory', handleSearchStory);
+app.post('/searchStory',handleAuthUser, handleSearchStory);
 app.post('/addRemoveRecentSearched', handleAuthUser, handleAddRemoveRecentSearched);
 app.get('/getRecentSearched', handleAuthUser, handleGetAllRecentSearched);
 

@@ -1,16 +1,65 @@
 const RecentSearch = require("../Models/recentsearchModel");
 const Story = require("../Models/storyModel");
+const Favourite = require('../Models/favouriteModel');
 
 async function handleSearchStory(req, res) {
 
+    const userId = req.user.userData._id;
+        
+    const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
+    const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
+    
     const { query } = req.body;
     if(!query) return res.status(400).json({ error: "Please provide the query first." });
     
     const regex = new RegExp(query, 'i');
-    const storyResultData = await Story.find({ $or: [{ storyTitle: regex }, { storyDescription: regex }] });
+    // const storyResultData = await Story.find({ $or: [{ storyTitle: regex }, { storySummary: regex }] });
+    const latestData = await Story.aggregate([
+                                            {
+                                                $match: {
+                                                    $or: [
+                                                        { storyTitle: regex },
+                                                        { storySummary: regex }
+                                                    ]
+                                                }
+                                            },
+                                            // Adding the isFav field to the documents
+                                            {
+                                                $addFields: {
+                                                    isFav: {
+                                                        $cond: [
+                                                            { $in: ["$_id", finalUserFavouriteStory] },
+                                                            1,
+                                                            0
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            // Projecting only necessary fields
+                                            {
+                                                $project: {
+                                                    _id: 1,
+                                                    ageRange: 1,
+                                                    audioURL: 1,
+                                                    imageURL: 1,
+                                                    createdAt: 1,
+                                                    storyTags: 1,
+                                                    storyText: 1,
+                                                    storyGenre: 1,
+                                                    storyMoral: 1,
+                                                    storyTheme: 1,
+                                                    storyTitle: 1,
+                                                    audioLength: 1,
+                                                    storySummary: 1,
+                                                    thumbnailURL: 1,
+                                                    storyLanguage: 1,
+                                                    isFav: 1
+                                                }
+                                            }
+                                        ]);
 
-    if(storyResultData.length == 0) return res.status(400).json({ error: "Record not found, please try again with the new keyword." });    
-    return res.status(201).json(storyResultData);
+    if(latestData.length == 0) return res.status(400).json({ error: "Record not found, please try again with the new keyword." });    
+    return res.status(201).json(latestData);
 }
 
 async function handleAddRemoveRecentSearched(req, res) {
