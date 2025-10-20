@@ -247,7 +247,7 @@ async function handleGetAllRelatedStories(req, res) {
                                                     {
                                                         $match: {
                                                             $or: [
-                                                                {genreId: storyData[0]['genreId']}, 
+                                                                // {genreId: storyData[0]['genreId']}, 
                                                                 {tags: storyData[0]['tags']}
                                                             ],
                                                             _id: { $ne: new ObjectId(currentStoryId) }

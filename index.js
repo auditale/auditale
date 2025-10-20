@@ -59,7 +59,7 @@ app.post('/addStory', handleAuthUser, validateStory, handleAddStory);
 app.get('/getAllStory', handleAuthUser, handleGetAllStory);
 app.get('/getGenreBasedStory', handleAuthUser, handleGetAllGenreBasedStory);
 app.get('/getAllGenreWithStories', handleAuthUser, handleGetAllGenreWithStories);
-app.get('/relatedStories', handleAuthUser, handleGetAllRelatedStories);
+app.post('/relatedStories', handleAuthUser, handleGetAllRelatedStories);
 app.get('/userRecommendationsStories', handleAuthUser, handleGetAllUserRecommedationsStories);
 
 // Favourite Routes
