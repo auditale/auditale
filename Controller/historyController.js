@@ -38,6 +38,7 @@ async function handleGetHistory(req, res) {
                 }
             }, {   $project: {
                     _id: 1,
+                    storyId: "$storydata._id",
                     ageRange: "$storydata.ageRange",
                     audioURL: "$storydata.audioURL",
                     imageURL: "$storydata.imageURL",

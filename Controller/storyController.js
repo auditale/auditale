@@ -225,10 +225,11 @@ async function handleGetTrialStories(req, res) {
 
 async function handleGetAllRelatedStories(req, res) {
     try {
+        
         const userId = req.user.userData._id;
-        const { currentStoryId } = req.body;
-        const storyData = await Story.find({ _id: currentStoryId }, { _id: 0, genreId: 1, tags: 1 });
-
+        const currentStoryId = req.query.currentStoryId;
+        const storyData = await Story.find({ _id: new ObjectId(currentStoryId) },{ storyGenre: 1, _id: 0 });
+        
         const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
         const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
 
@@ -247,8 +248,8 @@ async function handleGetAllRelatedStories(req, res) {
                                                     {
                                                         $match: {
                                                             $or: [
-                                                                // {genreId: storyData[0]['genreId']}, 
-                                                                {tags: storyData[0]['tags']}
+                                                                {storyGenre: storyData[0]['storyGenre']}
+                                                                // {storyTags: storyData[0]['storyTags']}
                                                             ],
                                                             _id: { $ne: new ObjectId(currentStoryId) }
                                                         }
