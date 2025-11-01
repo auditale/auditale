@@ -114,10 +114,21 @@ async function handleGetRecentlyAccessedStories(req, res) {
                 }
             }, {   $project: {
                     _id: 1,
+                    userId: 1,
+                    ageRange: "$storydata.ageRange",
+                    audioURL: "$storydata.audioURL",
+                    imageURL: "$storydata.imageURL",
+                    createdAt: "$storydata.createdAt",
+                    storyTags: "$storydata.storyTags",
+                    storyText: "$storydata.storyText",
+                    storyGenre: "$storydata.storyGenre",
+                    storyMoral: "$storydata.storyMoral",
+                    storyTheme: "$storydata.storyTheme",
                     storyTitle: "$storydata.storyTitle",
-                    storyDescription: "$storydata.storyDescription",
-                    storyImage: "$storydata.storyImage",
-                    storyURL: "$storydata.storyURL",
+                    audioLength: "$storydata.audioLength",
+                    storySummary: "$storydata.storySummary",
+                    thumbnailURL: "$storydata.thumbnailURL",
+                    storyLanguage: "$storydata.storyLanguage"
                 }
             }
         ])
