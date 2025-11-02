@@ -104,7 +104,24 @@ async function handleGetAllGenreBasedStory(req, res) {
 
 async function handleGetAllUserFavouriteStory(req, res) {
     try {
+
+        const { sortTitle, filterGenre, sortDate } = req.query;
+        
         const userId = req.user.userData._id;
+        const sortStage = {};
+
+        if (sortTitle) {
+            sortStage.storyTitle = sortTitle === "desc" ? -1 : 1;
+        }
+
+        if (sortDate) {
+            sortStage.createdAt = sortDate === "desc" ? -1 : 1;
+        }
+
+        if (Object.keys(sortStage).length === 0) {
+            sortStage.createdAt = -1;
+        }
+
         const finalAllStoryWithUserFavourite = await Favourite.aggregate([
                                     {
                                         $match: {
@@ -124,6 +141,16 @@ async function handleGetAllUserFavouriteStory(req, res) {
                                             preserveNullAndEmptyArrays: true
                                         }
                                     },
+                                    // Optional filter by genre (if filterGenre exists)
+                                    ...(filterGenre
+                                        ? [
+                                            {
+                                            $match: {
+                                                "storydata.storyGenre": { $regex: filterGenre, $options: "i" }
+                                            }
+                                            }
+                                        ]
+                                        : []),
                                     {   $project: {
                                             userId: 1,
                                             storyId: "$storydata._id",
@@ -142,6 +169,8 @@ async function handleGetAllUserFavouriteStory(req, res) {
                                             thumbnailURL: "$storydata.thumbnailURL",
                                             storyLanguage: "$storydata.storyLanguage"
                                         }
+                                    },{
+                                        $sort: sortStage
                                     }
                                 ]);
                                 

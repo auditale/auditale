@@ -4,15 +4,28 @@ const Favourite = require('../Models/favouriteModel');
 
 async function handleSearchStory(req, res) {
 
+    const { searchTerm, sortTitle, filterGenre, sortDate } = req.query;
     const userId = req.user.userData._id;
-        
+    const sortStage = {};
+
+        if (sortTitle) {
+            sortStage.storyTitle = sortTitle === "desc" ? -1 : 1;
+        }
+
+        if (sortDate) {
+            sortStage.createdAt = sortDate === "desc" ? -1 : 1;
+        }
+
+        if (Object.keys(sortStage).length === 0) {
+            sortStage.createdAt = -1;
+        }
+    
     const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
     const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
     
-    const { query } = req.body;
-    if(!query) return res.status(400).json({ error: "Please provide the query first." });
+    if(!searchTerm) return res.status(400).json({ error: "Please search something..." });
     
-    const regex = new RegExp(query, 'i');
+    const regex = new RegExp(searchTerm, 'i');
     // const storyResultData = await Story.find({ $or: [{ storyTitle: regex }, { storySummary: regex }] });
     const latestData = await Story.aggregate([
                                             {
@@ -35,6 +48,16 @@ async function handleSearchStory(req, res) {
                                                     }
                                                 }
                                             },
+                                            // Optional filter by genre (if filterGenre exists)
+                                            ...(filterGenre
+                                                ? [
+                                                    {
+                                                    $match: {
+                                                        "storyGenre": { $regex: filterGenre, $options: "i" }
+                                                    }
+                                                    }
+                                                ]
+                                                : []),
                                             // Projecting only necessary fields
                                             {
                                                 $project: {
@@ -55,6 +78,8 @@ async function handleSearchStory(req, res) {
                                                     storyLanguage: 1,
                                                     isFav: 1
                                                 }
+                                            },{
+                                                $sort: sortStage
                                             }
                                         ]);
 
