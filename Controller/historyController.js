@@ -56,6 +56,18 @@ async function handleGetHistory(req, res) {
                     isFav: 1
 
                 }
+            },
+            // Group by storyId to get unique stories, keeping the latest one
+            { 
+                $group: {
+                    _id: "$storyId", // Group by storyId
+                    latestStory: { $first: "$$ROOT" } // Get the latest story based on the sort order
+                }
+            },
+            {
+                $replaceRoot: { 
+                    newRoot: "$latestStory" // Replace the root with the latest story object
+                }
             }
         ])
 
