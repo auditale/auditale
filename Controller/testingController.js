@@ -1,5 +1,12 @@
+const History = require("../Models/historyModel");
+
 async function testingBaseURL(req, res) {
     res.type('html').send(html);
+}
+
+async function handleDeleteValues(req, res) {
+  const result = await History.deleteMany({});
+  return res.status(200).json("Collection cleared successfully.");
 }
 
 const html = `
@@ -54,5 +61,6 @@ const html = `
 `
 
 module.exports = {
-    testingBaseURL
+    testingBaseURL,
+    handleDeleteValues
 }

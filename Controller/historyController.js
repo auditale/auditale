@@ -13,6 +13,21 @@ async function handleGetHistory(req, res) {
         const latestHistoryData = await History.aggregate([
             {   $match: {   "userId": new ObjectId(userId)  }   }, 
             {   $sort: {    createdAt: -1   }   },
+            {
+                // Group by storyId to make them unique
+                $group: {
+                _id: "$storyId",
+                doc: { $first: "$$ROOT" } // keep the most recent document per storyId
+                }
+            },
+            {
+                // Replace root to restore normal structure
+                $replaceRoot: { newRoot: "$doc" }
+            },
+            {
+                // Re-sort again by createdAt to restore the original order
+                $sort: { createdAt: -1 }
+            },
             {   $limit: 100 },
             {
                 $addFields: {
@@ -56,22 +71,10 @@ async function handleGetHistory(req, res) {
                     isFav: 1
 
                 }
-            },
-            // Group by storyId to get unique stories, keeping the latest one
-            { 
-                $group: {
-                    _id: "$storyId", // Group by storyId
-                    latestStory: { $first: "$$ROOT" } // Get the latest story based on the sort order
-                }
-            },
-            {
-                $replaceRoot: { 
-                    newRoot: "$latestStory" // Replace the root with the latest story object
-                }
             }
         ])
 
-        if(latestHistoryData.length == 0) return res.status(400).json({ error: "Record not found, please play some stories first." });    
+        if(latestHistoryData.length == 0) return res.status(400).json({ error: "Records are not found, please play some stories first." });    
         return res.status(200).json(latestHistoryData);
 
     } catch (error) {

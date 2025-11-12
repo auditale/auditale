@@ -1,5 +1,5 @@
 const express = require('express');
-const { testingBaseURL } = require('./Controller/testingController');
+const { testingBaseURL, handleDeleteValues } = require('./Controller/testingController');
 const { handleAddUpdateProfileImage, uploadFile } = require('./Controller/googleController');
 const { handleLoginUser, handleRegisterUser, handleUserProfile, handleUpdateProfile, handleUpdatePassword } = require('./Controller/authController');
 const { handleAddGenre, handleGetAllGenres } = require('./Controller/genreController');
@@ -78,3 +78,6 @@ app.post('/addRating', handleAuthUser, handleAddRatings);
 app.post('/addHistory', handleAuthUser, handleAddHistory);
 app.get('/getHistory', handleAuthUser, handleGetHistory);
 app.get('/getRecentlyAccessed', handleAuthUser, handleGetRecentlyAccessedStories);
+
+
+app.post('/deleteValues', handleDeleteValues);
