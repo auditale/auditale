@@ -257,8 +257,10 @@ async function handleGetAllRelatedStories(req, res) {
         
         const userId = req.user.userData._id;
         const currentStoryId = req.query.currentStoryId;
-        const storyData = await Story.find({ _id: new ObjectId(currentStoryId) },{ storyGenre: 1, _id: 0 });
-        
+        const storyData = await Story.find({ _id: new ObjectId(currentStoryId) },{ storyGenre: 1, storyTags: 1, _id: 0 }).lean();
+        const storyGenre = storyData[0].storyGenre;
+        const storyTags = storyData[0].storyTags;
+
         const userFavouriteStory = await Favourite.find({ userId: userId }, { storyId: 1, _id: 0 });
         const finalUserFavouriteStory = userFavouriteStory.map(item => item.storyId);
 
@@ -277,8 +279,8 @@ async function handleGetAllRelatedStories(req, res) {
                                                     {
                                                         $match: {
                                                             $or: [
-                                                                {storyGenre: storyData[0]['storyGenre']}
-                                                                // {storyTags: storyData[0]['storyTags']}
+                                                                {storyGenre: storyGenre },
+                                                                {storyTags: { $in: storyTags }}
                                                             ],
                                                             _id: { $ne: new ObjectId(currentStoryId) }
                                                         }

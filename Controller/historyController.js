@@ -130,6 +130,7 @@ async function handleGetRecentlyAccessedStories(req, res) {
             }, {   $project: {
                     _id: 1,
                     userId: 1,
+                    storyId: "$storydata._id",
                     ageRange: "$storydata.ageRange",
                     audioURL: "$storydata.audioURL",
                     imageURL: "$storydata.imageURL",
